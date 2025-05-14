@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Food Rescue Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            100: '#e6f7ec',
+                            200: '#c2ead5',
+                            600: '#14b757',
+                            700: '#0e9a47'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .role-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .role-selected {
+            border-color: #14b757;
+            background-color: rgba(20, 183, 87, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-seedling text-primary-600 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-gray-800">Food Rescue</span>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="{{ url_for('login') }}" class="text-gray-600 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium">
+                        Already have an account? Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex-grow container mx-auto px-4 py-8 max-w-3xl">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-2xl font-bold text-gray-800">Create your account</h2>
+                <p class="text-gray-600 mt-1">Join our community and help reduce food waste</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="px-6 py-4">
+                        {% for message in messages %}
+                            <div class="bg-red-50 text-red-700 p-4 rounded-md mb-4">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('signup') }}" class="p-6">
+                <div class="mb-8">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Select your role</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for role in roles %}
+                            <div class="role-card border-2 border-gray-200 rounded-lg p-4" data-role="{{ role.id }}">
+                                <div class="flex items-start space-x-4">
+                                    <div class="{{ role.bg_class }} p-3 rounded-full">
+                                        {% if role.id == 'donor' %}
+                                            <i class="fas fa-hand-holding-heart {{ role.icon_class }}"></i>
+                                        {% elif role.id == 'recipient' %}
+                                            <i class="fas fa-hands-receiving {{ role.icon_class }}"></i>
+                                        {% elif role.id == 'delivery' %}
+                                            <i class="fas fa-truck {{ role.icon_class }}"></i>
+                                        {% elif role.id == 'admin' %}
+                                            <i class="fas fa-user-shield {{ role.icon_class }}"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-medium text-gray-900">{{ role.name }}</h4>
+                                        <p class="text-gray-600">{{ role.description }}</p>
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex items-center">
+                                    <input type="radio" name="role" id="role-{{ role.id }}" value="{{ role.id }}" class="form-radio h-4 w-4 text-primary-600 focus:ring-primary-500" required>
+                                    <label for="role-{{ role.id }}" class="ml-2 text-sm text-gray-700">Select this role</label>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" name="name" id="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" name="email" id="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" id="password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500" 
+                                minlength="8" required>
+                            <p class="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
+                        </div>
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                            <input type="password" name="confirm_password" id="confirm-password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-primary-500 focus:border-primary-500" 
+                                minlength="8" required>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" name="terms" id="terms" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" required>
+                        <label for="terms" class="ml-2 block text-sm text-gray-700">
+                            I agree to the <a href="#" class="text-primary-600 hover:text-primary-700">Terms of Service</a> and <a href="#" class="text-primary-600 hover:text-primary-700">Privacy Policy</a>
+                        </label>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                            Create Account
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="mt-4 text-center text-gray-600 text-sm">
+            <p>Already have an account? <a href="{{ url_for('login') }}" class="text-primary-600 hover:text-primary-700 font-medium">Login here</a></p>
+        </div>
+    </div>
+
+    <footer class="bg-white mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-500 text-sm">
+                &copy; 2025 Food Rescue Platform. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Role selection cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleCards = document.querySelectorAll('.role-card');
+            
+            roleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Clear previously selected
+                    roleCards.forEach(c => c.classList.remove('role-selected'));
+                    
+                    // Select this card
+                    this.classList.add('role-selected');
+                    
+                    // Check the radio button
+                    const roleId = this.getAttribute('data-role');
+                    document.getElementById('role-' + roleId).checked = true;
+                });
+            });
+
+            // Password confirmation validation
+            const form = document.querySelector('form');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirm-password');
+
+            form.addEventListener('submit', function(event) {
+                if (password.value !== confirmPassword.value) {
+                    event.preventDefault();
+                    alert('Passwords do not match!');
+                    confirmPassword.focus();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

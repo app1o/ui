@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Food Buddy - Fighting Food Waste{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E8F5E9',
+                            100: '#C8E6C9',
+                            200: '#A5D6A7',
+                            300: '#81C784',
+                            400: '#66BB6A',
+                            500: '#4CAF50',
+                            600: '#43A047',
+                            700: '#388E3C',
+                            800: '#2E7D32',
+                            900: '#1B5E20',
+                        },
+                        secondary: {
+                            50: '#E3F2FD',
+                            100: '#BBDEFB',
+                            200: '#90CAF9',
+                            300: '#64B5F6',
+                            400: '#42A5F5',
+                            500: '#2196F3',
+                            600: '#1E88E5',
+                            700: '#1976D2',
+                            800: '#1565C0',
+                            900: '#0D47A1',
+                        },
+                        accent: {
+                            50: '#FFF3E0',
+                            100: '#FFE0B2',
+                            200: '#FFCC80',
+                            300: '#FFB74D',
+                            400: '#FFA726',
+                            500: '#FF9800',
+                            600: '#FB8C00',
+                            700: '#F57C00',
+                            800: '#EF6C00',
+                            900: '#E65100',
+                        },
+                        success: {
+                            500: '#4CAF50',
+                            600: '#43A047',
+                        },
+                        warning: {
+                            500: '#FF9800',
+                            600: '#FB8C00',
+                        },
+                        error: {
+                            500: '#F44336',
+                            600: '#E53935',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.2s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.5;
+        }
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    {% if current_user.is_authenticated %}
+    <div class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <span class="text-primary-600 font-bold text-xl">Food Buddy</span>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        {% if current_user.role == 'donor' %}
+                        <a href="{{ url_for('donor_dashboard') }}" class="border-primary-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        {% elif current_user.role == 'recipient' %}
+                        <a href="{{ url_for('recipient_dashboard') }}" class="border-primary-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        {% elif current_user.role == 'delivery' %}
+                        <a href="{{ url_for('delivery_dashboard') }}" class="border-primary-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        {% elif current_user.role == 'admin' %}
+                        <a href="{{ url_for('admin_dashboard') }}" class="border-primary-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <div class="ml-3 relative">
+                        <div class="flex items-center">
+                            <div class="text-sm font-medium text-gray-700 mr-2">{{ current_user.name }}</div>
+                            <div class="bg-primary-100 text-primary-800 text-xs px-2 py-1 rounded-full capitalize">{{ current_user.role }}</div>
+                            <a href="{{ url_for('logout') }}" class="ml-4 text-gray-500 hover:text-gray-700">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <main>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 animate-fade-in" role="alert">
+                <p class="text-sm text-yellow-700">{{ message }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-white mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-sm text-gray-500">
+                &copy; 2025 Food Buddy. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for scroll animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
